@@ -25,6 +25,7 @@ Raises:
     HTTPError: _The request returned an erronious HTTP status code_.
 """
 
+import re
 import requests
 from typing import Union
 from . import __version__
@@ -65,12 +66,19 @@ class Rustmaps:
             'User-Agent': f'rustmaps.py/{__version__}',
             'accept': 'application/json'
         }
+        self.__UUID_PATTERN = re.compile(
+            r'^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$',
+            re.IGNORECASE
+        )
 
         # public constants
         self.MIN_MAP_SEED = 0
         self.MAX_MAP_SEED = 2147483645
         self.MIN_MAP_SIZE = 1000
         self.MAX_MAP_SIZE = 6000
+
+    def __validate_uuid(self, uuid: str) -> bool:
+        return bool(self.__UUID_PATTERN.match(uuid))
 
     def __validate_map_seed(self, seed: int) -> bool:
         """_Validate user-provided map seed_.
@@ -111,9 +119,6 @@ class Rustmaps:
                 f'{size} is out of range. '
                 f'[{self.MIN_MAP_SIZE}:{self.MAX_MAP_SIZE}]'
             ))
-
-    def __validate_map_id(self, id: str) -> bool:
-        raise NotImplementedError
 
     def __get_map_data(self, url: str) -> Union[list, bool]:
         """_Request info about a map, agnostic of seed/size or mapId_.
@@ -175,8 +180,8 @@ class Rustmaps:
             list: _The JSON response from a successful API request._
             bool: _`False` if the map hasn't been generated yet._
         """
-        # TODO: validate map_id
-        # self.__validate_map_id(map_id)
+        if not self.__validate_uuid(map_id):
+            raise ValueError(f'{map_id} is not a valid UUID')
 
         REQUEST_URL = (
             f'{self.__API_URL}/maps/{map_id}'
