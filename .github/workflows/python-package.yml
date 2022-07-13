@@ -1,5 +1,3 @@
-# TODO: Implement the "package" part of this workflow.
-
 name: Lint, Test, and Package Python
 
 on:
