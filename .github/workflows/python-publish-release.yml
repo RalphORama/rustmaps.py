@@ -1,0 +1,57 @@
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Upload Python Package to PyPi
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: deploy
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: "3.x"
+        poetry-version: "1.1.14"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Set up Poetry ${{ matrix.poetry-version }}
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: ${{ matrix.poetry-version }}
+
+
+    - name: Install dependencies with Poetry
+      run: |
+        python -m pip install --upgrade pip
+        poetry install --verbose --ansi --no-interaction --no-root
+
+    - name: Test with pytest
+      run: |
+        poetry run --verbose --ansi pytest --verbose
+      env:
+        RUSTMAPS_API_KEY: ${{ secrets.RUSTMAPS_API_KEY }}
+
+    - name: Build package and publish to PyPi
+      run: |
+        poetry publish --build --verbose --ansi --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
+      env:
+        PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
