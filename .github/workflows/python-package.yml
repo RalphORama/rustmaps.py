@@ -35,17 +35,21 @@ jobs:
     - name: Install dependencies with Poetry
       run: |
         python -m pip install --upgrade pip
-        poetry install --ansi --verbose --no-interaction --no-root
+        poetry install --verbose --ansi --no-interaction --no-root
 
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        poetry run --verbose --ansi flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        poetry run flake8 . --count --exit-zero --max-complexity=10 --statistics
+        poetry run --verbose --ansi flake8 . --count --exit-zero --max-complexity=10 --statistics
 
     - name: Test with pytest
       run: |
-        poetry run pytest --verbose
+        poetry run --verbose --ansi pytest --verbose
       env:
         RUSTMAPS_API_KEY: ${{ secrets.RUSTMAPS_API_KEY }}
+
+    - name: Create Python packages
+      run: |
+        poetry build --verbose --ansi
