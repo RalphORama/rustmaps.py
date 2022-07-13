@@ -1,3 +1,29 @@
+[project]
+name = "rustmaps.py"
+version = "0.1.0"
+description = "Wrapper for the rustmaps.com REST API"
+authors = [{name="Ralph Drake", email="pypi@ralphdrake.com"}]
+license = { file="LICENSE.md" }
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/RalphORama/rustmaps.py/"
+"Bug Tracker" = "https://github.com/RalphORama/rustmaps.py/issues"
+
 [tool.poetry]
 name = "rustmaps.py"
 version = "0.1.0"
@@ -15,6 +41,7 @@ pytest = "^7.1.2"
 pytest-dependency = "^0.5.1"
 pre-commit = "^2.20.0"
 flake8-docstrings = "^1.6.0"
+setuptools = "^63.1.0"
 
 [tool.poetry.scripts]
 # test = "pytest"

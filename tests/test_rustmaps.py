@@ -16,8 +16,8 @@
 
 import pytest
 import random
-from rustmaps import __version__
-from rustmaps import Rustmaps
+from src.rustmaps import __version__
+from src.rustmaps import Rustmaps
 from os import getenv
 
 RUSTMAPS_API_KEY = str(getenv('RUSTMAPS_API_KEY'))
@@ -29,7 +29,7 @@ MAP_ID = '474b4c64-ab86-4128-a075-e88737fa5820'
 @pytest.mark.dependency()
 def test_version():
     """Assert version number is correct."""
-    assert __version__ == '0.1.0', "rustmaps.py is the wrong version."
+    assert __version__ == '0.1.0', "rustmaps.py package is the wrong version."
 
 
 @pytest.mark.dependency(depends=['test_version'])

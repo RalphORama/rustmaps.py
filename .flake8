@@ -7,7 +7,9 @@ exclude =
 
 per-file-ignores =
     # Ignore unused imports
-    rustmaps/__init__.py: F401
+    src/rustmaps/__init__.py: F401
+    # Ignore line length too
+    setup.py: F401, E501
     # Ignore missing docstrings in tests
     tests/__init__.py: D100, D104
     # Ignore line length requirements for tests
