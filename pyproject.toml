@@ -1,11 +1,12 @@
-[project]
-name = "rustmaps.py"
+[tool.poetry]
 version = "0.1.0"
+name = "rustmaps.py"
 description = "Wrapper for the rustmaps.com REST API"
-authors = [{name="Ralph Drake", email="pypi@ralphdrake.com"}]
-license = { file="LICENSE.md" }
 readme = "README.md"
-requires-python = ">=3.8"
+authors = ["Ralph Drake <pypi@ralphdrake.com>"]
+license = "AGPL-3.0-or-later"
+packages = [{include = "rustmaps", from = "src"}]
+keywords = ["requests", "api", "development"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -19,17 +20,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3 :: Only",
 ]
-
-[project.urls]
-"Homepage" = "https://github.com/RalphORama/rustmaps.py/"
-"Bug Tracker" = "https://github.com/RalphORama/rustmaps.py/issues"
-
-[tool.poetry]
-name = "rustmaps.py"
-version = "0.1.0"
-description = "Wrapper for the rustmaps.com REST API"
-authors = ["Ralph Drake <pypi@ralphdrake.com>"]
-license = "AGPL-3.0-or-later"
+"homepage" = "https://github.com/RalphORama/rustmaps.py/"
+"repository" = "https://github.com/RalphORama/rustmaps.py/"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -42,6 +34,7 @@ pytest-dependency = "^0.5.1"
 pre-commit = "^2.20.0"
 flake8-docstrings = "^1.6.0"
 setuptools = "^63.1.0"
+build = "^0.8.0"
 
 [tool.poetry.scripts]
 # test = "pytest"
