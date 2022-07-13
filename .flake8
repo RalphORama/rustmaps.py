@@ -1,0 +1,14 @@
+[flake8]
+exclude =
+    .git,
+    .venv,
+    .vscode,
+    __pycache__
+
+per-file-ignores =
+    # Ignore unused imports
+    rustmaps/__init__.py: F401
+    # Ignore missing docstrings in tests
+    tests/__init__.py: D100, D104
+    # Ignore line length requirements for tests
+    tests/test_rustmaps.py: D100, D104, E501
