@@ -1,16 +1,13 @@
 """Setuptools module for PyPi package."""
 
 from setuptools import setup, find_packages
-# from rustmaps import __version__
 import pathlib
 
-__version__ = '0.1.0'
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="rustmaps.py",
-    version=f"{__version__}",
     description="A Python 3 wrapper for the rustmaps.com HTTP REST API",
     long_description=long_description,
     long_description_content_type="text/markdown",
