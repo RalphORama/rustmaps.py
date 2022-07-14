@@ -57,25 +57,25 @@ class Rustmaps:
             request_timeout (int, optional): _Timeout for API requests in ms._
                 Defaults to 1000 (1 second).
         """
-        self.__api_key = api_key
-        self.__staging = staging
-        self.__barren = barren
-        self.__request_timeout = request_timeout
+        self._api_key = api_key
+        self._staging = staging
+        self._barren = barren
+        self._request_timeout = request_timeout
 
         # List of request timestamps, used for internal rate limits
         # Stored in Epoch format, UTC timezone.
         # max requests within the last 60 seconds: 80
         # max requests within the last 3600 seconds: 3600
-        self.__request_timestamps = []
+        self._request_timestamps = []
 
         # internal constants
-        self.__API_URL = 'https://rustmaps.com/api/v2'
-        self.__HEADERS = {
-            'X-API-Key': self.__api_key,
+        self._API_URL = 'https://rustmaps.com/api/v2'
+        self._HEADERS = {
+            'X-API-Key': self._api_key,
             'User-Agent': f'rustmaps.py/{__version__}',
             'accept': 'application/json'
         }
-        self.__UUID_PATTERN = re.compile(
+        self._UUID_PATTERN = re.compile(
             r'^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$',
             re.IGNORECASE
         )
@@ -88,26 +88,26 @@ class Rustmaps:
         self.MAX_REQUESTS_PER_MINUTE = 80
         self.MAX_REQUESTS_PER_HOUR = 3600
 
-    def ___is_rate_limited(self) -> bool:
+    def _is_rate_limited(self) -> bool:
         """Check if we are hitting rustmaps.com's API rate limit.
 
         Returns:
             bool: `True` if we are rate limited, `False` otherwise.
         """
         # Return early if we don't have any timestamps yet, why not
-        if len(self.__request_timestamps) == 0:
+        if len(self._request_timestamps) == 0:
             return False
 
         reqs_this_minute = 0
         reqs_this_hour = 0
         now = time.time_ns()
 
-        for stamp in self.__request_timestamps:
+        for stamp in self._request_timestamps:
             # Convert no. of seconds passed since `stamp` to an interger
             stamp_diff = int(ceil((now - stamp) / (10 ** 9)))
 
             if stamp_diff > 3600:
-                self.__request_timestamps.remove(stamp)
+                self._request_timestamps.remove(stamp)
                 continue
 
             if stamp_diff <= 60:
@@ -121,10 +121,10 @@ class Rustmaps:
             (reqs_this_hour >= self.MAX_REQUESTS_PER_HOUR)
         )
 
-    def __validate_uuid(self, uuid: str) -> bool:
-        return bool(self.__UUID_PATTERN.match(uuid))
+    def _validate_uuid(self, uuid: str) -> bool:
+        return bool(self._UUID_PATTERN.match(uuid))
 
-    def __validate_map_seed(self, seed: int) -> bool:
+    def _validate_map_seed(self, seed: int) -> bool:
         """_Validate user-provided map seed_.
 
         Args:
@@ -144,7 +144,7 @@ class Rustmaps:
                 f'[{self.MIN_MAP_SEED}:{self.MAX_MAP_SEED}]'
             ))
 
-    def __validate_map_size(self, size: int) -> bool:
+    def _validate_map_size(self, size: int) -> bool:
         """_Validate user-provided map size_.
 
         Args:
@@ -164,7 +164,7 @@ class Rustmaps:
                 f'[{self.MIN_MAP_SIZE}:{self.MAX_MAP_SIZE}]'
             ))
 
-    def __get_map_data(self, url: str) -> Union[list, bool]:
+    def _get_map_data(self, url: str) -> Union[list, bool]:
         """_Request info about a map, agnostic of seed/size or mapId_.
 
         Args:
@@ -177,7 +177,7 @@ class Rustmaps:
             Union[list, bool]: _Returns `False` if map doesn't exist, or a
                 `list` JSON object with map data._
         """
-        if self.___is_rate_limited():
+        if self._is_rate_limited():
             warn(
                 'Skipping request because the rate limit is reached.',
                 RuntimeWarning,
@@ -185,9 +185,9 @@ class Rustmaps:
             )
             return
 
-        self.__request_timestamps.append(time.time_ns())
-        r = requests.get(url, headers=self.__HEADERS,
-                         timeout=self.__request_timeout)
+        self._request_timestamps.append(time.time_ns())
+        r = requests.get(url, headers=self._HEADERS,
+                         timeout=self._request_timeout)
 
         # Map exists
         if r.status_code == 200:
@@ -213,15 +213,15 @@ class Rustmaps:
             list: _The JSON response from a successful API request._
             bool: _`False` if the map hasn't been generated yet._
         """
-        self.__validate_map_seed(seed)
-        self.__validate_map_size(size)
+        self._validate_map_seed(seed)
+        self._validate_map_size(size)
 
         REQUEST_URL = (
-            f'{self.__API_URL}/maps/{seed}/{size}'
-            f'?staging={self.__staging}&barren={self.__barren}'
+            f'{self._API_URL}/maps/{seed}/{size}'
+            f'?staging={self._staging}&barren={self._barren}'
         )
 
-        return self.__get_map_data(REQUEST_URL)
+        return self._get_map_data(REQUEST_URL)
 
     def get_map_by_id(self, map_id: str) -> Union[list, bool]:
         """_Request info about a map associated with a `map_id` UUID_.
@@ -233,15 +233,15 @@ class Rustmaps:
             list: _The JSON response from a successful API request._
             bool: _`False` if the map hasn't been generated yet._
         """
-        if not self.__validate_uuid(map_id):
+        if not self._validate_uuid(map_id):
             raise ValueError(f'{map_id} is not a valid UUID')
 
         REQUEST_URL = (
-            f'{self.__API_URL}/maps/{map_id}'
-            f'?staging={self.__staging}&barren={self.__barren}'
+            f'{self._API_URL}/maps/{map_id}'
+            f'?staging={self._staging}&barren={self._barren}'
         )
 
-        return self.__get_map_data(REQUEST_URL)
+        return self._get_map_data(REQUEST_URL)
 
     def list_maps(self, filter: str, page=0):
         """_Search generated maps with filter, return paginated results_.
@@ -275,7 +275,7 @@ class Rustmaps:
         Returns:
             list: _The JSON response data from the API._
         """
-        if self.___is_rate_limited():
+        if self._is_rate_limited():
             warn(
                 'Skipping request because the rate limit is reached.',
                 RuntimeWarning
@@ -283,13 +283,13 @@ class Rustmaps:
             return
 
         REQUEST_URL = (
-            f'{self.__API_URL}/maps/{seed}/{size}'
-            f'?staging={self.__staging}&barren={self.__barren}'
+            f'{self._API_URL}/maps/{seed}/{size}'
+            f'?staging={self._staging}&barren={self._barren}'
         )
 
-        self.__request_timestamps.append(time.time_ns())
-        r = requests.post(REQUEST_URL, headers=self.__HEADERS,
-                          timeout=self.__request_timeout)
+        self._request_timestamps.append(time.time_ns())
+        r = requests.post(REQUEST_URL, headers=self._HEADERS,
+                          timeout=self._request_timeout)
 
         # Map has started generating
         if r.status_code == 200:
