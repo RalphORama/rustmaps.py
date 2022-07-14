@@ -20,11 +20,14 @@ import tomli
 from src.rustmaps import __version__
 from src.rustmaps import Rustmaps
 from os import getenv
+from requests.exceptions import HTTPError
+from warnings import warn
 
 RUSTMAPS_API_KEY = str(getenv('RUSTMAPS_API_KEY'))
 MAP_SEED = 590877946
 MAP_SIZE = 2500
 MAP_ID = '474b4c64-ab86-4128-a075-e88737fa5820'
+RATE_LIMIT_REACHED = False
 
 
 @pytest.mark.dependency()
@@ -59,27 +62,53 @@ w = Rustmaps(RUSTMAPS_API_KEY)
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
 def test_get_map_by_seed():
     """Make sure map seed, size, and ID all match so we know tests are sane."""
+    global RATE_LIMIT_REACHED
+
+    if RATE_LIMIT_REACHED:
+        return
+
     print(
         f'Fetching details about map with seed {MAP_SEED} and size {MAP_SIZE}'
     )
 
-    map_data = w.get_map(MAP_SEED, MAP_SIZE)
-    map_id = map_data['id']
+    try:
+        map_data = w.get_map(MAP_SEED, MAP_SIZE)
+    except HTTPError as e:
+        if str(e).startswith('429'):  # too many requests
+            warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
+            RATE_LIMIT_REACHED = True
+        else:
+            raise e
+    else:
+        map_id = map_data['id']
 
-    assert map_id == MAP_ID, (
-        f"get_map() returned unexpected ID {map_id}"
-    )
+        assert map_id == MAP_ID, (
+            f"get_map() returned unexpected ID {map_id}"
+        )
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
 def test_get_map_by_id():
     """Request info about a map using its UUID designator."""
-    map_data = w.get_map_by_id(MAP_ID)
-    map_seed = map_data['seed']
-    map_size = map_data['size']
+    global RATE_LIMIT_REACHED
 
-    assert map_seed == MAP_SEED
-    assert map_size == MAP_SIZE
+    if RATE_LIMIT_REACHED:
+        return
+
+    try:
+        map_data = w.get_map_by_id(MAP_ID)
+    except HTTPError as e:
+        if str(e).startswith('429'):  # too many requests
+            warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
+            RATE_LIMIT_REACHED = True
+        else:
+            raise e
+    else:
+        map_seed = map_data['seed']
+        map_size = map_data['size']
+
+        assert map_seed == MAP_SEED
+        assert map_size == MAP_SIZE
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
@@ -92,26 +121,50 @@ def test_list_maps():
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
 def test_generate_new_map_nocallback():
     """Generate a new map without a callback URL."""
+    global RATE_LIMIT_REACHED
+
+    if RATE_LIMIT_REACHED:
+        return
+
     random_seed = random.randint(w.MIN_MAP_SEED, w.MAX_MAP_SEED)
     random_size = random.randint(w.MIN_MAP_SIZE, w.MAX_MAP_SIZE)
 
-    r = w.generate_map(random_seed, random_size)
-
-    assert r['exists'] is False, (
-        f'Map size {random_size} with seed {random_seed} already exists.'
-    )
-    assert len(r['mapId']) == 36, (
-        f"Expected 36 char UUID for mapId, got {r['mapId']} instead."
-    )
+    try:
+        r = w.generate_map(random_seed, random_size)
+    except HTTPError as e:
+        if str(e).startswith('429'):  # too many requests
+            warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
+            RATE_LIMIT_REACHED = True
+        else:
+            raise e
+    else:
+        assert r['exists'] is False, (
+            f'Map size {random_size} with seed {random_seed} already exists.'
+        )
+        assert len(r['mapId']) == 36, (
+            f"Expected 36 char UUID for mapId, got {r['mapId']} instead."
+        )
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
 def test_generate_existing_map_nocallback():
     """Generate an existing map without a callback URL."""
-    r = w.generate_map(MAP_SEED, MAP_SIZE)
+    global RATE_LIMIT_REACHED
 
-    assert r['exists'] is True
-    assert r['mapId'] == MAP_ID
+    if RATE_LIMIT_REACHED:
+        return
+
+    try:
+        r = w.generate_map(MAP_SEED, MAP_SIZE)
+    except HTTPError as e:
+        if str(e).startswith('429'):  # too many requests
+            warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
+            RATE_LIMIT_REACHED = True
+        else:
+            raise e
+    else:
+        assert r['exists'] is True
+        assert r['mapId'] == MAP_ID
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key', 'test_callback_url'])
