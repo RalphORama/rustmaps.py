@@ -1,7 +1,7 @@
 name: CI
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     concurrency:
-      group: ci
+      group: ci-py_${{ matrix.python-version }}-poe_${{ matrix.poetry-version }}
 
     runs-on: ubuntu-latest
     environment: testing
