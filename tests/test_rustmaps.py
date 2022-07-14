@@ -16,6 +16,7 @@
 
 import pytest
 import random
+import time
 import tomli
 from src.rustmaps import __version__
 from src.rustmaps import Rustmaps
@@ -28,6 +29,8 @@ MAP_SEED = 590877946
 MAP_SIZE = 2500
 MAP_ID = '474b4c64-ab86-4128-a075-e88737fa5820'
 RATE_LIMIT_REACHED = False
+
+w = None
 
 
 @pytest.mark.dependency()
@@ -46,17 +49,18 @@ def test_version():
 @pytest.mark.dependency(depends=['test_version'])
 def test_api_key():
     """Assert we successfully retrieved the API key from its env var."""
+    global w
+
     assert len(RUSTMAPS_API_KEY) == 36, 'RUSTMAPS_API_KEY is not 36 chars.'
+
+    # create API wrapper object we'll use for the rest of our tests
+    w = Rustmaps(RUSTMAPS_API_KEY)
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
 def test_callback_url():
     """Send a test payload to the callback URL to make sure it's live."""
     pass
-
-
-# create API wrapper object we'll use for the rest of our tests
-w = Rustmaps(RUSTMAPS_API_KEY)
 
 
 @pytest.mark.dependency(depends=['test_version', 'test_api_key'])
@@ -181,3 +185,35 @@ def test_generate_new_map_with_callback():
 def test_generate_existing_map_with_callback():
     """Generate an existing map, make sure callback URL is used."""
     pass
+
+
+@pytest.mark.dependency(depends=['test_version', 'test_api_key'])
+def test_internal_rate_limit():
+    """Make sure logic for internal request rate limiting is sound."""
+    # Don't touch class internals like I do here...
+    if w._request_timestamps:
+        w._request_timestamps.clear()
+    assert len(w._request_timestamps) == 0
+
+    # Test limit of 80 requests in one minute
+    # use `1` instead of `0` for our first param so we get one less than
+    # the limit
+    for i in range(1, w.MAX_REQUESTS_PER_MINUTE):
+        w._request_timestamps.append(time.time_ns())
+    assert (not w._is_rate_limited())
+
+    # bump over the limit
+    w._request_timestamps.append(time.time_ns())
+    assert w._is_rate_limited()
+
+    # Test limit of 3600 requests in 60 minutes
+    w._request_timestamps.clear()
+    two_minute_offset = 2 * 60 * (10 ** 9)  # two minutes in nanoseconds
+    for i in range(1, w.MAX_REQUESTS_PER_HOUR):
+        w._request_timestamps.append(time.time_ns() - two_minute_offset)
+    assert (not w._is_rate_limited())
+
+    w._request_timestamps.append(time.time_ns() - two_minute_offset)
+    assert w._is_rate_limited()
+
+    w._request_timestamps.clear()
