@@ -65,7 +65,7 @@ def test_get_map_by_seed():
     global RATE_LIMIT_REACHED
 
     if RATE_LIMIT_REACHED:
-        return
+        pytest.skip('rustmaps.com API rate limit reached.')
 
     print(
         f'Fetching details about map with seed {MAP_SEED} and size {MAP_SIZE}'
@@ -77,6 +77,7 @@ def test_get_map_by_seed():
         if str(e).startswith('429'):  # too many requests
             warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
             RATE_LIMIT_REACHED = True
+            pytest.skip('rustmaps.com API rate limit reached.')
         else:
             raise e
     else:
@@ -93,7 +94,7 @@ def test_get_map_by_id():
     global RATE_LIMIT_REACHED
 
     if RATE_LIMIT_REACHED:
-        return
+        pytest.skip('rustmaps.com API rate limit reached.')
 
     try:
         map_data = w.get_map_by_id(MAP_ID)
@@ -101,6 +102,7 @@ def test_get_map_by_id():
         if str(e).startswith('429'):  # too many requests
             warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
             RATE_LIMIT_REACHED = True
+            pytest.skip('rustmaps.com API rate limit reached.')
         else:
             raise e
     else:
@@ -124,7 +126,7 @@ def test_generate_new_map_nocallback():
     global RATE_LIMIT_REACHED
 
     if RATE_LIMIT_REACHED:
-        return
+        pytest.skip('rustmaps.com API rate limit reached.')
 
     random_seed = random.randint(w.MIN_MAP_SEED, w.MAX_MAP_SEED)
     random_size = random.randint(w.MIN_MAP_SIZE, w.MAX_MAP_SIZE)
@@ -135,6 +137,7 @@ def test_generate_new_map_nocallback():
         if str(e).startswith('429'):  # too many requests
             warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
             RATE_LIMIT_REACHED = True
+            pytest.skip('rustmaps.com API rate limit reached.')
         else:
             raise e
     else:
@@ -152,7 +155,7 @@ def test_generate_existing_map_nocallback():
     global RATE_LIMIT_REACHED
 
     if RATE_LIMIT_REACHED:
-        return
+        pytest.skip('rustmaps.com API rate limit reached.')
 
     try:
         r = w.generate_map(MAP_SEED, MAP_SIZE)
@@ -160,6 +163,7 @@ def test_generate_existing_map_nocallback():
         if str(e).startswith('429'):  # too many requests
             warn(RuntimeWarning('WARNING: You are being rate limited by the API.'))
             RATE_LIMIT_REACHED = True
+            pytest.skip('rustmaps.com API rate limit reached.')
         else:
             raise e
     else:
