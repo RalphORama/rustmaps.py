@@ -16,6 +16,7 @@
 
 import pytest
 import random
+import tomli
 from src.rustmaps import __version__
 from src.rustmaps import Rustmaps
 from os import getenv
@@ -28,8 +29,15 @@ MAP_ID = '474b4c64-ab86-4128-a075-e88737fa5820'
 
 @pytest.mark.dependency()
 def test_version():
-    """Assert version number is correct."""
-    assert __version__ == '0.1.0', "rustmaps.py package is the wrong version."
+    """Assert version number is consistent between package and project file."""
+    with open('pyproject.toml', 'rb') as pyproject_toml:
+        pyproject = tomli.load(pyproject_toml)
+
+    pyproject_version = pyproject['tool']['poetry']['version']
+
+    assert __version__ == pyproject_version, (
+        "Package __version__ and pyproject.toml version differ."
+    )
 
 
 @pytest.mark.dependency(depends=['test_version'])
