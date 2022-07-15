@@ -1,5 +1,5 @@
 [tool.poetry]
-version = "0.1.0"
+version = "0.2.0"
 name = "rustmaps.py"
 description = "Wrapper for the rustmaps.com REST API"
 readme = "README.md"
