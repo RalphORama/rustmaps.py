@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   deploy:
+    name: Deploy rustmaps.py ${{ github.ref }} to PyPI
 
     runs-on: ubuntu-latest
     environment: deploy

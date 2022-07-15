@@ -8,7 +8,9 @@ on:
   push
 
 jobs:
-  build:
+  ci:
+    name: ci testing (python ${{ matrix.python-version }}, poetry ${{ matrix.poetry-version }})
+
     concurrency:
       group: ci-py_${{ matrix.python-version }}
 
