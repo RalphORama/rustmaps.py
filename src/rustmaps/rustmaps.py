@@ -32,6 +32,7 @@ from math import ceil
 from typing import Union
 from warnings import warn
 from . import __version__
+from .enums import MonumentAlignment
 
 
 class Rustmaps:
@@ -257,6 +258,18 @@ class Rustmaps:
         # TODO: Implement this endpoint.
         raise NotImplementedError
 
+    def list_outposts(self) -> Union[list, None]:
+        """Fetch a list of custom Outpost layouts available to the user.
+
+        Raises:
+            NotImplementedError: This method is not implemented yet.
+
+        Returns:
+            list: A list of available custom outpost layouts.
+            None: No custom outpost layouts are available.
+        """
+        raise NotImplementedError
+
     def generate_map(self, seed: int, size: int,
                      callback_url: str = None) -> list:
         """_Request the generation of a new map_.
@@ -312,3 +325,68 @@ class Rustmaps:
         # Something has gone horribly wrong!
         else:
             r.raise_for_status()
+
+    def generate_custom_map(
+        self,
+        seed: int,
+        size: int,
+        name: str = None,
+        generate_ring_road=-1,
+        remove_small_powerlines=False,
+        remove_large_powerlines=False,
+        remove_car_wrecks=False,
+        remove_rivers=False,
+        modify_tiers=False,
+        terrain={'enabled': False, 'island_intensity': 0},
+        large_oil_rig_pos={
+            'enabled': False,
+            'alignment': MonumentAlignment.TOP,
+            'position': 0.5
+        },
+        small_oil_rig_pos={
+            'enabled': False,
+            'alignment': 0,
+            'position': 0.5
+        },
+        custom_outpost={
+            'enabled': False,
+            'prefab_name': 'default'
+        },
+        large_monuments={},
+        small_monuments={},
+        harbors={},
+        safezones={},
+        water_wells={},
+        caves={},
+        mountains={},
+        quarries={}
+    ):
+        """Generate a custom map with user-specified parameters.
+
+        Args:
+            seed (int): The seed of the map.
+            size (int): The size of the map.
+            name (str): Unused. Defaults to None.
+            generate_ring_road (int, optional): Whether to generate a road that encircles the map. Possible values are: -1 (agnostic), 0 (do not generate), and 1 (force generation). Defaults to -1.
+            remove_small_powerlines (bool, optional): Disable small powerline generation? Defaults to False.
+            remove_large_powerlines (bool, optional): Disable large powerline generation? Defaults to False.
+            remove_car_wrecks (bool, optional): Disable static car wrecks spawning next to roads? Defaults to False.
+            remove_rivers (bool, optional): Disable river generation? Defaults to False.
+            modify_tiers (bool, optional): Enable arbitrary monument placement for better odds of generating desired monuments. Defaults to False.
+            terrain (dict, optional): Define the amount of smaller islands that spawn around the map. Set island_intensity to 0 for no islands, up to 10 for lots of islands. Defaults to {'enabled': False, 'island_intensity': 0}.
+            large_oil_rig_pos (dict, optional): Define a custom spawn position on the map's edge for large oil rig. Defaults to { 'enabled': False, 'alignment': MonumentAlignment.TOP, 'position': 0.5 }.
+            small_oil_rig_pos (dict, optional): Define a custom spawn position on the map's edge for small oil rig. Defaults to { 'enabled': False, 'alignment': 0, 'position': 0.5 }.
+            custom_outpost (dict, optional): Specify a custom Outpost prefab to use during generation. Defaults to { 'enabled': False, 'prefab_name': 'default' }.
+            large_monuments (dict, optional): Dict of large monuments and their generation options. Defaults to {}.
+            small_monuments (dict, optional): Dict of small monuments and their generation options. Defaults to {}.
+            harbors (dict, optional): Dict of harbor monuments and their generation options. Defaults to {}.
+            safezones (dict, optional): Dict of safe zone monuments and their generation options. Defaults to {}.
+            water_wells (dict, optional): Dict of water well monuments and their generation options. Defaults to {}.
+            caves (dict, optional): Dict of cave prefabs and their generation options. Defaults to {}.
+            mountains (dict, optional): Dict of mountain prefabs and their generation options. Defaults to {}.
+            quarries (dict, optional): Dict of quarry monuments and their generation options. Defaults to {}.
+
+        Raises:
+            NotImplementedError: This method is not yet implemented.
+        """ # noqa E501
+        raise NotImplementedError
