@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     concurrency:
-      group: ci-py_${{ matrix.python-version }}-poe_${{ matrix.poetry-version }}
+      group: ci-py_${{ matrix.python-version }}
 
     runs-on: ubuntu-latest
     environment: testing
