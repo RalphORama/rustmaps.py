@@ -268,6 +268,7 @@ class Rustmaps:
             list: A list of available custom outpost layouts.
             None: No custom outpost layouts are available.
         """
+        # TODO: Also implement class field to store custom outpost list?
         raise NotImplementedError
 
     def generate_map(self, seed: int, size: int,
@@ -389,4 +390,7 @@ class Rustmaps:
         Raises:
             NotImplementedError: This method is not yet implemented.
         """ # noqa E501
+        # TODO: implement enum for generate_ring_road?
+        # TODO: define "default" dicts for large_monuments, small_monuments,
+        #       harbors, safezones, water_wells, caves, mountains, and quarries
         raise NotImplementedError
