@@ -40,15 +40,22 @@ jobs:
     - name: Install dependencies with Poetry
       run: poetry install --no-interaction --no-root
 
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # run linting
+        poetry run flake8 . --count --max-complexity=10 --statistics
+
     - name: Test with pytest
       run: poetry run pytest --verbose
       env:
         RUSTMAPS_API_KEY: ${{ secrets.RUSTMAPS_API_KEY }}
 
-    - name: Build package files with poetry
+    - name: Build package files with Poetry
       run: poetry build --no-interaction
 
-    - name: Build package and publish to PyPI
+    - name: Publish package files to PyPI
       run: poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
