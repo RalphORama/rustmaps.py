@@ -26,6 +26,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install Poetry v1.1.x with pipx
+      run: pipx install 'poetry>=1.1,<1.2'
+
+    - name: Set up Python 3.8.x
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.8'
+        cache: 'poetry'
+
+    - name: Install dependencies with Poetry
+      run: poetry install --no-interaction --no-root
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
